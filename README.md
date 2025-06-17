@@ -1,5 +1,6 @@
 # Complete Setup Guide: n8n + Docker Model Runner
 
+
 ## Prerequisites
 
 1. **Docker Desktop 4.40+** (Mac with Apple Silicon)
@@ -14,6 +15,9 @@
 3. Enable **"Enable Docker Model Runner"**
 4. Optionally enable **"Enable host-side TCP support"** (port 12434)
 5. Click **Apply & restart**
+
+<img width="1125" alt="image" src="https://github.com/user-attachments/assets/50b61ba8-e84a-4321-98b6-87eb39fe656a" />
+
 
 ### Using CLI:
 ```bash
