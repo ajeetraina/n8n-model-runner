@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# n8n + Model Runner + MCP Demo Script (Fixed)
+# n8n + Model Runner 
 # Uses existing n8n setup if available
 # ============================================
 
