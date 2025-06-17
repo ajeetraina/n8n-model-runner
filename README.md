@@ -1,5 +1,8 @@
 # Complete Setup Guide: n8n + Docker Model Runner
 
+<img width="922" alt="image" src="https://github.com/user-attachments/assets/900e4c32-2558-4779-9262-6035b898a2b6" />
+
+
 
 ## Prerequisites
 
