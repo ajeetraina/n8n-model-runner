@@ -16,6 +16,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+      - n8n_network
 
   # n8n workflow automation with Model Runner integration
   n8n:
