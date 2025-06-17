@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   # PostgreSQL database for n8n
