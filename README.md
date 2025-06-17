@@ -60,11 +60,15 @@ cd n8n-ai-setup
 
 Create the following files:
 
-### 1. `docker-compose.yml`
+### 1. `docker-compose.yaml`
 (Use the complete compose file provided above)
 
 ### 2. `.env`
 (Use the .env file provided above - **IMPORTANT: Change the encryption key!**)
+
+```
+cp sample.env .env
+```
 
 ### 3. Create shared directory
 ```bash
