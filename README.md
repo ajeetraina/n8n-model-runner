@@ -173,6 +173,22 @@ docker model status
 tail -f ~/Library/Containers/com.docker.docker/Data/log/host/inference-llama.cpp.log
 ```
 
+## Using the pre-built workflow file
+
+Assuming that you've already imported the [enhanced workflow](https://github.com/ajeetraina/n8n-model-runner/blob/main/n8n-workflow.json). 
+Now let's get it running in your n8n dashboard! 🚀
+
+1. In your n8n dashboard (http://localhost:5678):
+
+- Look for the workflow "🚀 Complete Stack Demo: AI + GitHub MCP + Model Runner"
+- Click the "Inactive" toggle in the top-right to make it "Active"
+- You should see it change to "Active" with a green indicator.
+
+<img width="1202" alt="image" src="https://github.com/user-attachments/assets/de29c6fa-0b13-4975-b974-718ad058c302" />
+
+
+  2. 
+
 ## Troubleshooting
 
 ### Common Issues:
