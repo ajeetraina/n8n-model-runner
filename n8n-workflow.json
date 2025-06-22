@@ -30,7 +30,7 @@
     },
     {
       "parameters": {
-        "url": "=http://model-runner:12434/engines/v1/models",
+        "url": "=http://model-runner.docker.internal:12434/engines/v1/models",
         "authentication": "none",
         "requestMethod": "GET",
         "options": {}
@@ -53,7 +53,7 @@
     },
     {
       "parameters": {
-        "url": "=http://model-runner:12434/engines/v1/chat/completions",
+        "url": "=http://model-runner.docker.internal:12434/v1/chat/completions",
         "authentication": "none",
         "requestMethod": "POST",
         "sendHeaders": true,
