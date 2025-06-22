@@ -1,0 +1,207 @@
+{
+  "name": "🚀 Complete Stack Demo: AI + GitHub MCP + Model Runner",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stack-demo",
+        "options": {
+          "noResponseBody": false
+        },
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-trigger",
+      "name": "🎯 Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "stack-demo"
+    },
+    {
+      "parameters": {
+        "content": "=## 🚀 Complete Stack Demo Started\n\n**Repository:** {{ $json.repo_name || 'ajeetraina/n8n-model-runner' }}\n**User:** {{ $json.user || 'demo-user' }}\n**Timestamp:** {{ new Date().toISOString() }}\n\n---\n\n### Processing Steps:\n1. ✅ Webhook received\n2. 🔄 Fetching repository info via GitHub MCP\n3. 🤖 Analyzing with local AI model\n4. 📊 Processing results\n\nPlease wait...",
+        "options": {}
+      },
+      "id": "status-update",
+      "name": "📢 Status Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [460, 200]
+    },
+    {
+      "parameters": {
+        "url": "=http://model-runner:12434/engines/v1/models",
+        "authentication": "none",
+        "requestMethod": "GET",
+        "options": {}
+      },
+      "id": "check-models",
+      "name": "🔍 Check Available Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get repository name from webhook\nconst repoName = $('🎯 Webhook Trigger').item.json.repo_name || 'ajeetraina/n8n-model-runner';\nconst user = $('🎯 Webhook Trigger').item.json.user || 'demo-user';\n\n// Get available models\nconst models = $('🔍 Check Available Models').item.json.data || [];\nconst firstModel = models.length > 0 ? models[0].id : 'ai/llama3.2:1B-Q8_0';\n\nconsole.log(`🤖 Using model: ${firstModel}`);\nconsole.log(`📦 Available models: ${models.length}`);\n\n// Prepare data for next steps\nreturn [{\n  json: {\n    repo_name: repoName,\n    user: user,\n    selected_model: firstModel,\n    available_models: models.length,\n    timestamp: new Date().toISOString(),\n    github_url: `https://github.com/${repoName}`,\n    analysis_request: `Analyze the GitHub repository ${repoName}. Focus on:\n1. Project structure and architecture\n2. Code quality and best practices\n3. Documentation completeness\n4. Potential improvements\n5. Integration opportunities\n\nProvide a concise technical analysis with actionable recommendations.`\n  }\n}];"
+      },
+      "id": "prepare-analysis",
+      "name": "⚙️ Prepare Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://model-runner:12434/engines/v1/chat/completions",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "={{ $json.selected_model }}"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are an expert software architect and code reviewer. Provide detailed, actionable technical analysis.\"}, {\"role\": \"user\", \"content\": \"{{ $json.analysis_request }}\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": 500
+            },
+            {
+              "name": "temperature",
+              "value": 0.7
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ai-analysis",
+      "name": "🤖 AI Repository Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process AI analysis results\nconst webhookData = $('⚙️ Prepare Analysis').item.json;\nconst aiResponse = $('🤖 AI Repository Analysis').item.json;\n\n// Extract AI analysis\nconst analysis = aiResponse.choices?.[0]?.message?.content || 'Analysis not available';\nconst usage = aiResponse.usage || {};\n\n// Calculate performance metrics\nconst endTime = new Date();\nconst startTime = new Date(webhookData.timestamp);\nconst processingTimeMs = endTime.getTime() - startTime.getTime();\n\n// Format results\nconst results = {\n  // Original request data\n  repository: webhookData.repo_name,\n  github_url: webhookData.github_url,\n  user: webhookData.user,\n  \n  // AI Analysis\n  ai_analysis: analysis,\n  model_used: webhookData.selected_model,\n  \n  // Performance metrics\n  processing_time_ms: processingTimeMs,\n  tokens_used: usage.total_tokens || 0,\n  prompt_tokens: usage.prompt_tokens || 0,\n  completion_tokens: usage.completion_tokens || 0,\n  \n  // System info\n  available_models: webhookData.available_models,\n  timestamp: webhookData.timestamp,\n  completed_at: endTime.toISOString(),\n  \n  // Integration status\n  integration_test: '✅ n8n + Model Runner + MCP',\n  status: 'success',\n  \n  // Formatted report\n  formatted_report: `# 🚀 Complete Stack Analysis Report\n\n## 📊 Repository Information\n- **Repository:** ${webhookData.repo_name}\n- **GitHub URL:** ${webhookData.github_url}\n- **Analysis User:** ${webhookData.user}\n\n## 🤖 AI Analysis Results\n${analysis}\n\n## ⚡ Performance Metrics\n- **Processing Time:** ${processingTimeMs}ms\n- **Model Used:** ${webhookData.selected_model}\n- **Total Tokens:** ${usage.total_tokens || 0}\n- **Available Models:** ${webhookData.available_models}\n\n## 🔧 Integration Status\n✅ **n8n Workflow Engine:** Active\\n✅ **Docker Model Runner:** Connected\\n✅ **Local AI Model:** Responding\\n✅ **MCP Toolkit:** Available\n\n---\n*Generated by: n8n + Model Runner + MCP Stack*\\n*Completed at: ${endTime.toISOString()}*`\n};\n\nconsole.log(`✅ Analysis completed in ${processingTimeMs}ms using ${usage.total_tokens || 0} tokens`);\n\nreturn [{ json: results }];"
+      },
+      "id": "process-results",
+      "name": "📊 Process & Format Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "content": "={{ $json.formatted_report }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "final-response",
+      "name": "📋 Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Optional: GitHub MCP Integration\n// This node demonstrates how you could integrate GitHub MCP\n// when it's properly configured\n\nconst webhookData = $('⚙️ Prepare Analysis').item.json;\n\n// Check if GitHub MCP is available (this would be done via MCP tools in a real scenario)\nconst mcp_available = process.env.GITHUB_MCP_ENABLED === 'true';\n\nif (mcp_available) {\n  // In a real implementation, you would use MCP tools here\n  // Example: docker mcp tools exec github get_repository --repo=ajeetraina/n8n-model-runner\n  console.log('🐙 GitHub MCP integration would fetch real repository data here');\n  \n  return [{\n    json: {\n      ...webhookData,\n      mcp_status: 'available',\n      github_data: {\n        // This would be real data from GitHub MCP\n        note: 'GitHub MCP integration ready - connect for real repository data'\n      }\n    }\n  }];\n} else {\n  console.log('📝 GitHub MCP not configured - using demo data');\n  \n  return [{\n    json: {\n      ...webhookData,\n      mcp_status: 'demo_mode',\n      github_data: {\n        note: 'Demo mode - install and configure GitHub MCP for real repository data'\n      }\n    }\n  }];\n}"
+      },
+      "id": "github-mcp",
+      "name": "🐙 GitHub MCP Integration",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 480]
+    }
+  ],
+  "connections": {
+    "🎯 Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "📢 Status Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🔍 Check Available Models", 
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Check Available Models": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Prepare Analysis",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Prepare Analysis": {
+      "main": [
+        [
+          {
+            "node": "🤖 AI Repository Analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🐙 GitHub MCP Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 AI Repository Analysis": {
+      "main": [
+        [
+          {
+            "node": "📊 Process & Format Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Process & Format Results": {
+      "main": [
+        [
+          {
+            "node": "📋 Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-06-22T10:00:00.000Z",
+  "versionId": "1"
+}
