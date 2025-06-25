@@ -117,26 +117,74 @@ docker compose logs -f n8n
 
 ### Quick Test Workflow:
 
-1. **Create a new workflow** in n8n
-2. **Add a Manual Trigger** node
-3. **Add an HTTP Request** node with these settings:
-   - **Method**: POST
-   - **URL**: `http://model-runner.docker.internal/engines/llama.cpp/v1/chat/completions`
-   - **Headers**: `Content-Type: application/json`
-   - **Body**:
-   ```json
-   {
-     "model": "ai/llama3.2:1B-Q8_0",
-     "messages": [
-       {
-         "role": "user",
-         "content": "Hello! Please introduce yourself."
-       }
-     ],
-     "max_tokens": 100
-   }
-   ```
-4. **Execute the workflow** and verify you get a response
+### Step 1: Create a New Workflow
+
+- Click the "+ New Workflow" button (usually in the top-left corner)
+- Or use Ctrl+Alt+N (Windows/Linux) or Cmd+Option+N (Mac)
+
+### Step 2: Add Manual Trigger Node
+
+- Click the "+ Add first step" button in the canvas
+- In the node selection panel, search for "Manual Trigger" or "When clicking 'Test workflow'"
+- Click on it to add it to your workflow
+
+### Step 3: Add HTTP Request Node
+
+- Click the "+" button that appears after the Manual Trigger node
+- Search for "HTTP Request" in the node panel
+- Select "HTTP Request" (not "Webhook" or other HTTP nodes)
+
+### Step 4: Configure HTTP Request Node
+
+- Click on the HTTP Request node to open its settings panel:
+- Authentication Tab:
+- Set to "None" (default)
+
+### Parameters Tab:
+
+- Method: Select "POST" from the dropdown
+- URL: Enter: http://model-runner.docker.internal/engines/llama.cpp/v1/chat/completions
+
+### Headers Section:
+
+- Click "Add Header"
+- Name: Content-Type
+- Value: application/json
+
+### Body Section:
+
+- Body Content Type: Select "JSON"
+- In the JSON field, paste:
+
+```
+{
+  "model": "ai/llama3.2:1B-Q8_0",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello! Please introduce yourself."
+    }
+  ],
+  "max_tokens": 100
+}
+```
+
+Options Tab (Optional):
+
+You can set a timeout if needed (default is usually fine)
+
+### Step 5: Test the Workflow
+
+- Click "Save" to save your workflow
+- Click "Test workflow" button (usually in the top-right)
+- Click "Execute workflow" when the manual trigger appears
+
+### Troubleshooting Tips:
+
+If you can't find certain options, make sure you're in the correct tab (Parameters, Headers, Body, etc.)
+The interface might vary slightly depending on your n8n version
+Make sure the HTTP Request node is properly connected to the Manual Trigger node
+
 
 ### Using n8n's Built-in AI Nodes:
 
